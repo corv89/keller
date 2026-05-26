@@ -58,8 +58,10 @@ class AppState: ObservableObject {
             let formulae = response.formulae.map { $0.toFormula() }
             try? cacheManager.write(formulae)
 
+            let annotations = AnnotationStore.loadSync()
+
             self.entries = formulae.map { f in
-                ToolEntry(formula: f, annotation: Annotation())
+                ToolEntry(formula: f, annotation: annotations[f.name] ?? Annotation())
             }
             self.clampSelection()
         } catch {

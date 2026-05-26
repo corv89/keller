@@ -7,12 +7,15 @@ struct ActionBar: View {
     let onToggleDeps: () -> Void
 
     var body: some View {
-        HStack {
-            Button("Toggle Deps", action: onToggleDeps)
-            Button("Refresh", action: onRefresh)
-            Button("Quit") { exit(0) }
-            Spacer()
-            Text(depsLabel).foregroundColor(.gray)
+        VStack(spacing: 0) {
+            HStack {
+                Button("Toggle Deps", action: onToggleDeps)
+                Button("Refresh", action: onRefresh)
+                Button("Clear Filter", action: { state.filterText = ""; state.clampSelection() })
+                Button("Quit") { exit(0) }
+                Spacer()
+                Text(depsLabel).foregroundColor(.gray)
+            }
         }
     }
 

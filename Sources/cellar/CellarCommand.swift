@@ -54,9 +54,11 @@ extension AppState {
             }
         }
 
+        let annotations = AnnotationStore.loadSync()
+
         let state = AppState()
         state.entries = formulae.map { f in
-            ToolEntry(formula: f, annotation: Annotation())
+            ToolEntry(formula: f, annotation: annotations[f.name] ?? Annotation())
         }
         return state
     }

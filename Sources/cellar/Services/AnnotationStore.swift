@@ -15,6 +15,14 @@ actor AnnotationStore {
         self.url = url
     }
 
+    static func loadSync(url: URL = defaultURL) -> [String: Annotation] {
+        guard FileManager.default.fileExists(atPath: url.path) else { return [:] }
+        guard let data = try? Data(contentsOf: url),
+              let decoded = try? JSONDecoder().decode([String: Annotation].self, from: data)
+        else { return [:] }
+        return decoded.filter { !$0.value.isEmpty }
+    }
+
     private func ensureDirectory() throws {
         let dir = url.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

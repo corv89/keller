@@ -7,6 +7,8 @@ struct CellarApp: View {
         VStack(spacing: 0) {
             headerBar
 
+            filterBar
+
             HStack(spacing: 1) {
                 ScrollView {
                     ListPanel(state: state)
@@ -32,12 +34,24 @@ struct CellarApp: View {
         }
     }
 
+    private var filterBar: some View {
+        HStack {
+            Text("Filter:").foregroundColor(.gray)
+            TextField(placeholder: state.filterText.isEmpty ? "type to filter, Enter to apply" : state.filterText) { text in
+                state.filterText = text
+                state.clampSelection()
+            }
+            Spacer()
+        }
+    }
+
     private var countLabel: String {
         let counts = state.entryCounts
         let visible = state.visibleEntries.count
+        let filter = state.filterText.isEmpty ? "" : " filter:\(state.filterText)"
         if state.showDependencies {
-            return "(\(visible)/\(counts.total) formulae)"
+            return "(\(visible)/\(counts.total))\(filter)"
         }
-        return "(\(visible)/\(counts.request) explicit)"
+        return "(\(visible)/\(counts.request) explicit)\(filter)"
     }
 }
