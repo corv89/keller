@@ -1,0 +1,78 @@
+{
+  "formulae": [
+    {
+      "name": "abseil",
+      "desc": "C++ Common Libraries",
+      "homepage": "https://abseil.io",
+      "dependencies": [],
+      "caveats": null,
+      "deprecated": false,
+      "disabled": false,
+      "outdated": false,
+      "installed": [
+        {
+          "version": "20260107.1",
+          "used_options": [],
+          "built_as_bottle": true,
+          "poured_from_bottle": true,
+          "time": 1770925654,
+          "runtime_dependencies": [],
+          "installed_on_request": false
+        }
+      ]
+    },
+    {
+      "name": "action-validator",
+      "desc": "Tool to validate GitHub Action and Workflow YAML files",
+      "homepage": "https://github.com/mpalmer/action-validator",
+      "dependencies": [],
+      "caveats": null,
+      "deprecated": false,
+      "disabled": false,
+      "outdated": false,
+      "installed": [
+        {
+          "version": "0.9.0",
+          "used_options": [],
+          "built_as_bottle": true,
+          "poured_from_bottle": true,
+          "time": 1776365771,
+          "runtime_dependencies": [],
+          "installed_on_request": true
+        }
+      ]
+    },
+    {
+      "name": "ada-url",
+      "desc": "WHATWG-compliant and fast URL parser written in modern C++",
+      "homepage": "https://github.com/ada-url/ada",
+      "dependencies": [
+        "fmt"
+      ],
+      "caveats": null,
+      "deprecated": false,
+      "disabled": false,
+      "outdated": false,
+      "installed": [
+        {
+          "version": "3.4.4",
+          "used_options": [],
+          "built_as_bottle": true,
+          "poured_from_bottle": true,
+          "time": 1775861089,
+          "runtime_dependencies": [
+            {
+              "full_name": "fmt",
+              "version": "12.1.0",
+              "revision": 0,
+              "bottle_rebuild": 0,
+              "pkg_version": "12.1.0",
+              "declared_directly": true
+            }
+          ],
+          "installed_on_request": false
+        }
+      ]
+    }
+  ]
+}
