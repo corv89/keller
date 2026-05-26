@@ -38,6 +38,39 @@ struct BrewService: Sendable {
         throw BrewError.notInstalled
     }
 
+    func fetchInstalledFormulaeSync() throws -> [Formula] {
+        let brew = try brewPath()
+        let process = Process()
+        let stdout = Pipe()
+        let stderrPipe = Pipe()
+
+        process.executableURL = URL(fileURLWithPath: brew)
+        process.arguments = ["info", "--json=v2", "--installed"]
+        process.standardOutput = stdout
+        process.standardError = stderrPipe
+
+        try process.run()
+        let data = try stdout.fileHandleForReading.readToEnd()
+        process.waitUntilExit()
+
+        guard process.terminationStatus == 0 else {
+            let errData = try? stderrPipe.fileHandleForReading.readToEnd()
+            let errMsg = errData.flatMap { String(data: $0, encoding: .utf8) } ?? "unknown error"
+            throw BrewError.commandFailed(stderr: errMsg)
+        }
+
+        guard let data else {
+            throw BrewError.commandFailed(stderr: "no output from brew")
+        }
+
+        do {
+            let response = try JSONDecoder().decode(BrewInfoResponse.self, from: data)
+            return response.formulae.map { $0.toFormula() }
+        } catch {
+            throw BrewError.decodeFailed(error)
+        }
+    }
+
     func fetchInstalledFormulae() async throws -> [Formula] {
         let brew = try brewPath()
         let process = Process()

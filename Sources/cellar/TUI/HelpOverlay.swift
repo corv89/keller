@@ -9,17 +9,17 @@ struct HelpOverlay: View {
                 Text("cellar — Keybindings").bold()
                 Divider()
                 VStack(alignment: .leading) {
-                    helpRow("Arrow Up/Down", "Navigate formula list")
-                    helpRow("Arrow Left/Right", "Move between panels")
+                    helpRow("Arrow Up", "From list: filter field, then actions")
+                    helpRow("Arrow Down", "From actions: filter field, then list")
+                    helpRow("Arrow Left/Right", "Move between buttons / panels")
                     helpRow("Enter", "Activate focused control")
-                    helpRow("Toggle Deps", "Show/hide transitive deps")
                 }
                 Divider()
                 VStack(alignment: .leading) {
+                    helpRow("Toggle Deps", "Show/hide transitive deps")
                     helpRow("Edit", "Open $EDITOR for annotation")
                     helpRow("Refresh", "Re-fetch brew metadata")
                     helpRow("Clear Filter", "Remove active filter")
-                    helpRow("Help", "Toggle this overlay")
                     helpRow("Quit / Ctrl-C", "Exit cellar")
                 }
                 Spacer()

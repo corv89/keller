@@ -38,24 +38,7 @@ class AppState: ObservableObject {
         try? cacheManager.invalidate()
 
         do {
-            let brewService = BrewService()
-            let brewPath = try brewService.brewPath()
-
-            let process = Foundation.Process()
-            let pipe = Pipe()
-            process.executableURL = URL(fileURLWithPath: brewPath)
-            process.arguments = ["info", "--json=v2", "--installed"]
-            process.standardOutput = pipe
-            process.standardError = FileHandle.nullDevice
-
-            try process.run()
-            let data = try pipe.fileHandleForReading.readToEnd()
-            process.waitUntilExit()
-
-            guard process.terminationStatus == 0, let data else { return }
-
-            let response = try JSONDecoder().decode(BrewInfoResponse.self, from: data)
-            let formulae = response.formulae.map { $0.toFormula() }
+            let formulae = try BrewService().fetchInstalledFormulaeSync()
             try? cacheManager.write(formulae)
 
             let annotations = AnnotationStore.loadSync()

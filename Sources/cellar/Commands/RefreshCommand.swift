@@ -1,18 +1,17 @@
 import ArgumentParser
+import Foundation
 
-struct RefreshCommand: AsyncParsableCommand {
+struct RefreshCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "refresh",
         abstract: "Force rebuild the brew metadata cache."
     )
 
-    func run() async throws {
-        let brewService = BrewService()
+    func run() throws {
         let cacheManager = CacheManager()
-
         try cacheManager.invalidate()
 
-        let formulae = try await brewService.fetchInstalledFormulae()
+        let formulae = try BrewService().fetchInstalledFormulaeSync()
         try cacheManager.write(formulae)
 
         let onRequest = formulae.filter { $0.installedOnRequest }.count

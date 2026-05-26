@@ -1,3 +1,4 @@
+import Foundation
 import SwiftTUI
 
 struct CellarApp: View {
@@ -22,13 +23,7 @@ struct CellarApp: View {
                 }
             }
 
-            ActionBar(
-                state: state,
-                onRefresh: { state.refresh() },
-                onToggleDeps: { state.showDependencies.toggle() },
-                onEdit: { state.editSelected() },
-                onHelp: { showHelp.toggle() }
-            )
+            statusBar
         }
     }
 
@@ -37,6 +32,12 @@ struct CellarApp: View {
             Text("cellar").bold()
             Text(countLabel).foregroundColor(.gray)
             Spacer()
+            Button("Toggle Deps", action: { state.showDependencies.toggle() })
+            Button("Edit", action: { state.editSelected() })
+            Button("Refresh", action: { state.refresh() })
+            Button("Clear Filter", action: { state.filterText = ""; state.clampSelection() })
+            Button("Help", action: { showHelp.toggle() })
+            Button("Quit") { exit(0) }
         }
     }
 
@@ -51,6 +52,13 @@ struct CellarApp: View {
         }
     }
 
+    private var statusBar: some View {
+        HStack {
+            Text(depsLabel).foregroundColor(.gray)
+            Spacer()
+        }
+    }
+
     private var countLabel: String {
         let counts = state.entryCounts
         let visible = state.visibleEntries.count
@@ -59,5 +67,9 @@ struct CellarApp: View {
             return "(\(visible)/\(counts.total))\(filter)"
         }
         return "(\(visible)/\(counts.request) explicit)\(filter)"
+    }
+
+    private var depsLabel: String {
+        state.showDependencies ? "Showing all formulae" : "Showing explicit only"
     }
 }

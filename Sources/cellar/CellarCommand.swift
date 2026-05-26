@@ -3,14 +3,14 @@ import Foundation
 import SwiftTUI
 
 @main
-struct Cellar: AsyncParsableCommand {
+struct Cellar: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "cellar",
         abstract: "A browsable, annotatable overview of your Homebrew CLI tools.",
         subcommands: [EditCommand.self, RefreshCommand.self]
     )
 
-    func run() async throws {
+    func run() throws {
         let state = AppState.loadFromCacheOrFetch()
         Application(rootView: CellarApp(state: state)).start()
     }
@@ -25,29 +25,9 @@ extension AppState {
             formulae = cached
         } else {
             do {
-                let process = Foundation.Process()
-                let pipe = Pipe()
-                let brewPath = try BrewService().brewPath()
-                process.executableURL = URL(fileURLWithPath: brewPath)
-                process.arguments = ["info", "--json=v2", "--installed"]
-                process.standardOutput = pipe
-                process.standardError = FileHandle.nullDevice
-                try process.run()
-                let data = try pipe.fileHandleForReading.readToEnd()
-                process.waitUntilExit()
-
-                guard process.terminationStatus == 0, let data else {
-                    formulae = sampleData().map { $0.formula }
-                    let state = AppState()
-                    state.entries = sampleData()
-                    return state
-                }
-
-                let response = try JSONDecoder().decode(BrewInfoResponse.self, from: data)
-                formulae = response.formulae.map { $0.toFormula() }
+                formulae = try BrewService().fetchInstalledFormulaeSync()
                 try? cacheManager.write(formulae)
             } catch {
-                formulae = sampleData().map { $0.formula }
                 let state = AppState()
                 state.entries = sampleData()
                 return state
