@@ -5,17 +5,17 @@ struct ActionBar: View {
     @ObservedObject var state: AppState
     let onRefresh: () -> Void
     let onToggleDeps: () -> Void
+    let onEdit: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button("Toggle Deps", action: onToggleDeps)
-                Button("Refresh", action: onRefresh)
-                Button("Clear Filter", action: { state.filterText = ""; state.clampSelection() })
-                Button("Quit") { exit(0) }
-                Spacer()
-                Text(depsLabel).foregroundColor(.gray)
-            }
+        HStack {
+            Button("Toggle Deps", action: onToggleDeps)
+            Button("Edit", action: onEdit)
+            Button("Refresh", action: onRefresh)
+            Button("Clear Filter", action: { state.filterText = ""; state.clampSelection() })
+            Button("Quit") { exit(0) }
+            Spacer()
+            Text(depsLabel).foregroundColor(.gray)
         }
     }
 

@@ -69,6 +69,34 @@ class AppState: ObservableObject {
         }
     }
 
+    func editSelected() {
+        guard let entry = selectedEntry else { return }
+        do {
+            let edited = try EditorLauncher.edit(entry.annotation, name: entry.formula.name)
+
+            let url = AnnotationStore.defaultURL
+            var all = AnnotationStore.loadSync()
+            if edited.isEmpty {
+                all.removeValue(forKey: entry.formula.name)
+            } else {
+                all[entry.formula.name] = edited
+            }
+
+            let dir = url.deletingLastPathComponent()
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let data = try JSONEncoder().encode(all)
+            let tmp = dir.appendingPathComponent(".annotations.tmp.\(UUID().uuidString)")
+            try data.write(to: tmp, options: .atomic)
+            _ = try FileManager.default.replaceItemAt(url, withItemAt: tmp)
+
+            if let idx = entries.firstIndex(where: { $0.formula.name == entry.formula.name }) {
+                entries[idx].annotation = edited
+            }
+        } catch {
+            // Silently ignore edit failures
+        }
+    }
+
     private func matchesFilter(_ entry: ToolEntry) -> Bool {
         let query = filterText.lowercased()
         return entry.formula.name.lowercased().contains(query)

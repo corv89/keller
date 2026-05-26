@@ -21,7 +21,8 @@ struct CellarApp: View {
             ActionBar(
                 state: state,
                 onRefresh: { state.refresh() },
-                onToggleDeps: { state.showDependencies.toggle() }
+                onToggleDeps: { state.showDependencies.toggle() },
+                onEdit: { state.editSelected() }
             )
         }
     }

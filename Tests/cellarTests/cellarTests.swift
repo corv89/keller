@@ -186,3 +186,54 @@ struct CacheManagerTests {
         #expect(manager.loadIfFresh() == nil)
     }
 }
+
+@Suite("EditorLauncher")
+struct EditorLauncherTests {
+    @Test("Builds template with front-matter")
+    func testBuildTemplate() {
+        let annotation = Annotation(
+            notes: "my notes",
+            tags: ["cli", "network"],
+            examples: ["curl -s https://example.com"]
+        )
+        let template = EditorLauncher.buildTemplate(name: "curl", annotation: annotation)
+
+        #expect(template.contains("tags: [cli, network]"))
+        #expect(template.contains("my notes"))
+        #expect(template.contains("curl -s https://example.com"))
+    }
+
+    @Test("Parses template back to annotation")
+    func testParseTemplate() {
+        let content = """
+        ---
+        tags: [cli, network]
+        examples:
+          - "curl -s https://example.com"
+        ---
+
+        My notes about curl
+        """
+        let annotation = EditorLauncher.parseTemplate(content, fallback: Annotation())
+
+        #expect(annotation.tags == ["cli", "network"])
+        #expect(annotation.examples == ["curl -s https://example.com"])
+        #expect(annotation.notes == "My notes about curl")
+    }
+
+    @Test("Handles empty annotation template")
+    func testParseEmptyTemplate() {
+        let content = """
+        ---
+        tags: []
+        examples:
+        ---
+
+        """
+        let annotation = EditorLauncher.parseTemplate(content, fallback: Annotation())
+
+        #expect(annotation.tags.isEmpty)
+        #expect(annotation.examples.isEmpty)
+        #expect(annotation.notes.isEmpty)
+    }
+}
