@@ -2,6 +2,7 @@ import SwiftTUI
 
 struct CellarApp: View {
     @ObservedObject var state: AppState
+    @State var showHelp = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -15,14 +16,18 @@ struct CellarApp: View {
                 }
                 .frame(width: 28)
 
-                DetailPanel(state: state)
+                ZStack {
+                    DetailPanel(state: state)
+                    HelpOverlay(visible: showHelp)
+                }
             }
 
             ActionBar(
                 state: state,
                 onRefresh: { state.refresh() },
                 onToggleDeps: { state.showDependencies.toggle() },
-                onEdit: { state.editSelected() }
+                onEdit: { state.editSelected() },
+                onHelp: { showHelp.toggle() }
             )
         }
     }

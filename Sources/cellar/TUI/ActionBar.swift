@@ -6,6 +6,7 @@ struct ActionBar: View {
     let onRefresh: () -> Void
     let onToggleDeps: () -> Void
     let onEdit: () -> Void
+    let onHelp: () -> Void
 
     var body: some View {
         HStack {
@@ -13,6 +14,7 @@ struct ActionBar: View {
             Button("Edit", action: onEdit)
             Button("Refresh", action: onRefresh)
             Button("Clear Filter", action: { state.filterText = ""; state.clampSelection() })
+            Button("Help", action: onHelp)
             Button("Quit") { exit(0) }
             Spacer()
             Text(depsLabel).foregroundColor(.gray)
