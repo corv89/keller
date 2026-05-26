@@ -1,4 +1,5 @@
 import ArgumentParser
+import Foundation
 import SwiftTUI
 
 @main
@@ -10,13 +11,13 @@ struct Cellar: AsyncParsableCommand {
     )
 
     func run() async throws {
-        let state = await AppState.loadFromCacheOrFetch()
+        let state = AppState.loadFromCacheOrFetch()
         Application(rootView: CellarApp(state: state)).start()
     }
 }
 
 extension AppState {
-    static func loadFromCacheOrFetch() async -> AppState {
+    static func loadFromCacheOrFetch() -> AppState {
         let cacheManager = CacheManager()
 
         let formulae: [Formula]
@@ -24,20 +25,39 @@ extension AppState {
             formulae = cached
         } else {
             do {
-                formulae = try await BrewService().fetchInstalledFormulae()
+                let process = Foundation.Process()
+                let pipe = Pipe()
+                let brewPath = try BrewService().brewPath()
+                process.executableURL = URL(fileURLWithPath: brewPath)
+                process.arguments = ["info", "--json=v2", "--installed"]
+                process.standardOutput = pipe
+                process.standardError = FileHandle.nullDevice
+                try process.run()
+                let data = try pipe.fileHandleForReading.readToEnd()
+                process.waitUntilExit()
+
+                guard process.terminationStatus == 0, let data else {
+                    formulae = sampleData().map { $0.formula }
+                    let state = AppState()
+                    state.entries = sampleData()
+                    return state
+                }
+
+                let response = try JSONDecoder().decode(BrewInfoResponse.self, from: data)
+                formulae = response.formulae.map { $0.toFormula() }
                 try? cacheManager.write(formulae)
             } catch {
                 formulae = sampleData().map { $0.formula }
+                let state = AppState()
+                state.entries = sampleData()
+                return state
             }
         }
 
-        let annotations = (try? await AnnotationStore().load()) ?? [:]
-        let entries = formulae.map { f in
-            ToolEntry(formula: f, annotation: annotations[f.name] ?? Annotation())
-        }
-
         let state = AppState()
-        state.entries = entries
+        state.entries = formulae.map { f in
+            ToolEntry(formula: f, annotation: Annotation())
+        }
         return state
     }
 }

@@ -1,4 +1,5 @@
 import Combine
+import Foundation
 
 class AppState: ObservableObject {
     @Published var entries: [ToolEntry] = []
@@ -16,6 +17,54 @@ class AppState: ObservableObject {
         let visible = visibleEntries
         guard selectedIndex >= 0, selectedIndex < visible.count else { return nil }
         return visible[selectedIndex]
+    }
+
+    var entryCounts: (request: Int, total: Int) {
+        let req = entries.filter { $0.formula.installedOnRequest }.count
+        return (req, entries.count)
+    }
+
+    func clampSelection() {
+        let count = visibleEntries.count
+        if count == 0 {
+            selectedIndex = 0
+        } else if selectedIndex >= count {
+            selectedIndex = count - 1
+        }
+    }
+
+    func refresh() {
+        let cacheManager = CacheManager()
+        try? cacheManager.invalidate()
+
+        do {
+            let brewService = BrewService()
+            let brewPath = try brewService.brewPath()
+
+            let process = Foundation.Process()
+            let pipe = Pipe()
+            process.executableURL = URL(fileURLWithPath: brewPath)
+            process.arguments = ["info", "--json=v2", "--installed"]
+            process.standardOutput = pipe
+            process.standardError = FileHandle.nullDevice
+
+            try process.run()
+            let data = try pipe.fileHandleForReading.readToEnd()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0, let data else { return }
+
+            let response = try JSONDecoder().decode(BrewInfoResponse.self, from: data)
+            let formulae = response.formulae.map { $0.toFormula() }
+            try? cacheManager.write(formulae)
+
+            self.entries = formulae.map { f in
+                ToolEntry(formula: f, annotation: Annotation())
+            }
+            self.clampSelection()
+        } catch {
+            // Keep existing data on refresh failure
+        }
     }
 
     private func matchesFilter(_ entry: ToolEntry) -> Bool {

@@ -5,6 +5,8 @@ struct CellarApp: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            headerBar
+
             HStack(spacing: 1) {
                 ScrollView {
                     ListPanel(state: state)
@@ -16,9 +18,26 @@ struct CellarApp: View {
 
             ActionBar(
                 state: state,
-                onRefresh: {},
+                onRefresh: { state.refresh() },
                 onToggleDeps: { state.showDependencies.toggle() }
             )
         }
+    }
+
+    private var headerBar: some View {
+        HStack {
+            Text("cellar").bold()
+            Text(countLabel).foregroundColor(.gray)
+            Spacer()
+        }
+    }
+
+    private var countLabel: String {
+        let counts = state.entryCounts
+        let visible = state.visibleEntries.count
+        if state.showDependencies {
+            return "(\(visible)/\(counts.total) formulae)"
+        }
+        return "(\(visible)/\(counts.request) explicit)"
     }
 }
