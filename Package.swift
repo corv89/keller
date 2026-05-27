@@ -5,7 +5,7 @@ let package = Package(
             name: "keller",
     platforms: [.macOS(.v14)],
     dependencies: [
-        .package(url: "https://github.com/rensbreur/SwiftTUI", branch: "main"),
+        .package(name: "SwiftTUI", path: "Vendor/SwiftTUI"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
     ],
     targets: [
