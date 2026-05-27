@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import cellar
+@testable import keller
 
 @Suite("BrewJSON Decoding")
 struct BrewJSONDecodingTests {
@@ -64,7 +64,7 @@ struct BrewJSONDecodingTests {
 struct AnnotationStoreTests {
     private func makeTempStore() throws -> (AnnotationStore, URL) {
         let tmpDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("cellar-test-\(UUID().uuidString)")
+            .appendingPathComponent("keller-test-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
         let url = tmpDir.appendingPathComponent("annotations.json")
         let store = AnnotationStore(url: url)
@@ -135,7 +135,7 @@ struct AnnotationStoreTests {
 struct CacheManagerTests {
     private func makeManager() -> CacheManager {
         let tmpDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("cellar-cache-test-\(UUID().uuidString)")
+            .appendingPathComponent("keller-cache-test-\(UUID().uuidString)")
         return CacheManager(directory: tmpDir)
     }
 

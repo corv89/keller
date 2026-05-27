@@ -9,7 +9,7 @@ struct EditorLauncher {
         let template = buildTemplate(name: name, annotation: annotation)
 
         let tmpDir = FileManager.default.temporaryDirectory
-        let tmpFile = tmpDir.appendingPathComponent("cellar-\(name)-annotation.md")
+        let tmpFile = tmpDir.appendingPathComponent("keller-\(name)-annotation.md")
         try template.write(to: tmpFile, atomically: true, encoding: .utf8)
 
         let process = Foundation.Process()
@@ -45,7 +45,7 @@ struct EditorLauncher {
         }
         lines.append("---")
         lines.append("")
-        lines.append("<!-- cellar: annotation for \(name) -->")
+        lines.append("<!-- keller: annotation for \(name) -->")
         lines.append("<!-- Edit freely below. YAML front-matter for tags/examples. -->")
         lines.append(annotation.notes.isEmpty ? "" : annotation.notes)
         return lines.joined(separator: "\n")

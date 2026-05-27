@@ -7,7 +7,7 @@ actor AnnotationStore {
     static var defaultURL: URL {
         let configHome = ProcessInfo.processInfo.environment["XDG_CONFIG_HOME"]
             ?? NSString(string: "~").expandingTildeInPath.appending("/.config")
-        let dir = URL(fileURLWithPath: configHome).appendingPathComponent("cellar")
+        let dir = URL(fileURLWithPath: configHome).appendingPathComponent("keller")
         return dir.appendingPathComponent("annotations.json")
     }
 

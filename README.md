@@ -1,4 +1,4 @@
-# cellar
+# keller
 
 A browsable, annotatable overview of your Homebrew-installed CLI tools.
 
@@ -11,7 +11,7 @@ Solves the "I `brew install`ed something months ago and now I can't remember wha
 - Personal annotations: notes, tags, example commands per formula
 - Live substring filter across name, description, tags, and notes
 - Cached brew metadata (1-hour TTL) for fast startup
-- `cellar edit <name>` for scripting/quick annotation edits
+- `keller edit <name>` for scripting/quick annotation edits
 
 ## Requirements
 
@@ -22,18 +22,18 @@ Solves the "I `brew install`ed something months ago and now I can't remember wha
 ## Install
 
 ```bash
-git clone https://github.com/user/cellar.git
-cd cellar
+git clone https://github.com/user/keller.git
+cd keller
 swift build -c release
-ln -s $(pwd)/.build/release/cellar /usr/local/bin/cellar
+ln -s $(pwd)/.build/release/keller /usr/local/bin/keller
 ```
 
 ## Usage
 
 ```
-cellar              Launch the TUI (default)
-cellar edit <name>  Open $EDITOR on one formula's annotation
-cellar refresh      Force rebuild the brew metadata cache
+keller              Launch the TUI (default)
+keller edit <name>  Open $EDITOR on one formula's annotation
+keller refresh      Force rebuild the brew metadata cache
 ```
 
 ## Keybindings
@@ -49,11 +49,11 @@ cellar refresh      Force rebuild the brew metadata cache
 | Refresh | Re-fetch brew metadata |
 | Clear Filter | Remove active filter |
 | Help | Toggle keybinding reference |
-| Quit / Ctrl-C | Exit cellar |
+| Quit / Ctrl-C | Exit keller |
 
 ## Annotation format
 
-Annotations are stored in `~/.config/cellar/annotations.json`. When editing via the TUI or `cellar edit`, a temporary markdown file with YAML front-matter is opened:
+Annotations are stored in `~/.config/keller/annotations.json`. When editing via the TUI or `keller edit`, a temporary markdown file with YAML front-matter is opened:
 
 ```markdown
 ---
@@ -69,8 +69,8 @@ Your notes here.
 
 | File | Path |
 |---|---|
-| Annotations | `~/.config/cellar/annotations.json` |
-| Cache | `~/.cache/cellar/brew-snapshot.json` |
+| Annotations | `~/.config/keller/annotations.json` |
+| Cache | `~/.cache/keller/brew-snapshot.json` |
 
 Respects `XDG_CONFIG_HOME` and `XDG_CACHE_HOME` if set.
 

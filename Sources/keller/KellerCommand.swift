@@ -3,16 +3,16 @@ import Foundation
 import SwiftTUI
 
 @main
-struct Cellar: ParsableCommand {
+struct Keller: ParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "cellar",
+        commandName: "keller",
         abstract: "A browsable, annotatable overview of your Homebrew CLI tools.",
         subcommands: [EditCommand.self, RefreshCommand.self]
     )
 
     func run() throws {
         let state = AppState.loadFromCacheOrFetch()
-        Application(rootView: CellarApp(state: state)).start()
+        Application(rootView: KellerApp(state: state)).start()
     }
 }
 

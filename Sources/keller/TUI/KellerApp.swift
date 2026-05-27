@@ -1,7 +1,7 @@
 import Foundation
 import SwiftTUI
 
-struct CellarApp: View {
+struct KellerApp: View {
     @ObservedObject var state: AppState
     @State var showHelp = false
 
@@ -29,7 +29,7 @@ struct CellarApp: View {
 
     private var headerBar: some View {
         HStack {
-            Text("cellar").bold()
+            Text("keller").bold()
             Text(countLabel).foregroundColor(.gray)
             Spacer()
             Button("Toggle Deps", action: { state.showDependencies.toggle() })

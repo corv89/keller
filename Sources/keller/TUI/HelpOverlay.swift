@@ -6,7 +6,7 @@ struct HelpOverlay: View {
     var body: some View {
         if visible {
             VStack(alignment: .leading) {
-                Text("cellar — Keybindings").bold()
+                Text("keller — Keybindings").bold()
                 Divider()
                 VStack(alignment: .leading) {
                     helpRow("Arrow Up", "From list: filter field, then actions")
@@ -20,7 +20,7 @@ struct HelpOverlay: View {
                     helpRow("Edit", "Open $EDITOR for annotation")
                     helpRow("Refresh", "Re-fetch brew metadata")
                     helpRow("Clear Filter", "Remove active filter")
-                    helpRow("Quit / Ctrl-C", "Exit cellar")
+                    helpRow("Quit / Ctrl-C", "Exit keller")
                 }
                 Spacer()
                 Text("Navigate to Help to close").foregroundColor(.gray)

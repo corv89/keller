@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "cellar",
+            name: "keller",
     platforms: [.macOS(.v14)],
     dependencies: [
         .package(url: "https://github.com/rensbreur/SwiftTUI", branch: "main"),
@@ -10,15 +10,15 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "cellar",
+    name: "keller",
             dependencies: [
                 "SwiftTUI",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .testTarget(
-            name: "cellarTests",
-            dependencies: ["cellar"],
+            name: "kellerTests",
+            dependencies: ["keller"],
             resources: [.copy("Fixtures")]
         ),
     ]

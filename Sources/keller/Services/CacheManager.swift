@@ -11,7 +11,7 @@ struct CacheManager: Sendable {
     private static var defaultCacheDirectory: URL {
         let cacheHome = ProcessInfo.processInfo.environment["XDG_CACHE_HOME"]
             ?? NSString(string: "~").expandingTildeInPath.appending("/.cache")
-        return URL(fileURLWithPath: cacheHome).appendingPathComponent("cellar")
+        return URL(fileURLWithPath: cacheHome).appendingPathComponent("keller")
     }
 
     private var snapshotURL: URL {
