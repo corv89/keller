@@ -37,7 +37,7 @@ struct CellarApp: View {
             Button("Refresh", action: { state.refresh() })
             Button("Clear Filter", action: { state.filterText = ""; state.clampSelection() })
             Button("Help", action: { showHelp.toggle() })
-            Button("Quit") { exit(0) }
+            Button("Quit") { TerminalTeardown.restore(); exit(0) }
         }
     }
 

@@ -11,3 +11,13 @@ enum TerminalSize {
         max(columns - 29, 20)
     }
 }
+
+enum TerminalTeardown {
+    static func restore() {
+        var tattr = termios()
+        tcgetattr(STDIN_FILENO, &tattr)
+        tattr.c_lflag |= tcflag_t(ECHO | ICANON)
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &tattr)
+        FileHandle.standardOutput.write(Data("\u{1B}[?1049l\u{1B}[?25h".utf8))
+    }
+}
