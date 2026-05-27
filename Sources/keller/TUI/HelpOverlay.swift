@@ -26,6 +26,7 @@ struct HelpOverlay: View {
                 Text("Press ^H to close").foregroundColor(.gray)
             }
             .padding()
+            .background(.default)
             .border()
         }
     }
