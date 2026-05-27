@@ -7,6 +7,12 @@ enum TerminalSize {
         return Int(w.ws_col)
     }
 
+    static var rows: Int {
+        var w = winsize()
+        guard ioctl(STDOUT_FILENO, UInt(TIOCGWINSZ), &w) == 0, w.ws_row > 0 else { return 24 }
+        return Int(w.ws_row)
+    }
+
     static var detailWidth: Int {
         max(columns - 29, 20)
     }

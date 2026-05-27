@@ -8,6 +8,7 @@ class AppState: ObservableObject {
     @Published var filterText: String = ""
     @Published var showDependencies: Bool = false
     @Published var showHelp: Bool = false
+    var scrollOffset: Int = 0
 
     var visibleEntries: [ToolEntry] {
         entries
@@ -39,6 +40,18 @@ class AppState: ObservableObject {
         } else if selectedIndex >= count {
             selectedIndex = count - 1
         }
+        updateScrollOffset()
+    }
+
+    func updateScrollOffset() {
+        let height = TerminalSize.rows - 2
+        let count = visibleEntries.count
+        guard count > height else { scrollOffset = 0; return }
+        if selectedIndex < scrollOffset {
+            scrollOffset = selectedIndex
+        } else if selectedIndex >= scrollOffset + height {
+            scrollOffset = selectedIndex - height + 1
+        }
     }
 
     func handleKey(_ key: Key) -> Bool {
@@ -59,10 +72,12 @@ class AppState: ObservableObject {
             return true
         case .arrow(.up):
             if selectedIndex > 0 { selectedIndex -= 1 }
+            updateScrollOffset()
             return true
         case .arrow(.down):
             let count = visibleEntries.count
             if selectedIndex < count - 1 { selectedIndex += 1 }
+            updateScrollOffset()
             return true
         case .enter:
             editSelected()

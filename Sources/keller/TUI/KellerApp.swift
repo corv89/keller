@@ -9,10 +9,8 @@ struct KellerApp: View {
             headerBar
 
             HStack(spacing: 1) {
-                ScrollView {
-                    ListPanel(state: state)
-                }
-                .frame(width: 28)
+                ListPanel(state: state)
+                    .frame(width: 28)
 
                 ZStack {
                     DetailPanel(state: state)
