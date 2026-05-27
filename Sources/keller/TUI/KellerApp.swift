@@ -3,13 +3,10 @@ import SwiftTUI
 
 struct KellerApp: View {
     @ObservedObject var state: AppState
-    @State var showHelp = false
 
     var body: some View {
         VStack(spacing: 0) {
             headerBar
-
-            filterBar
 
             HStack(spacing: 1) {
                 ScrollView {
@@ -19,57 +16,32 @@ struct KellerApp: View {
 
                 ZStack {
                     DetailPanel(state: state)
-                    HelpOverlay(visible: showHelp)
+                    HelpOverlay(visible: state.showHelp)
                 }
             }
 
-            statusBar
+            bottomBar
         }
     }
 
     private var headerBar: some View {
         HStack {
             Text("keller").bold()
-            Text(countLabel).foregroundColor(.gray)
+            Text(state.countLabel).foregroundColor(.gray)
             Spacer()
-            Button("Toggle Deps", action: { state.showDependencies.toggle() })
-            Button("Edit", action: { state.editSelected() })
-            Button("Refresh", action: { state.refresh() })
-            Button("Clear Filter", action: { state.filterText = ""; state.clampSelection() })
-            Button("Help", action: { showHelp.toggle() })
-            Button("Quit") { TerminalTeardown.restore(); exit(0) }
+            Text("Deps").foregroundColor(state.showDependencies ? .green : .gray)
+            Text(" ^R Refresh ↵ Edit ^H Help ^Q Quit").foregroundColor(.gray)
         }
     }
 
-    private var filterBar: some View {
+    private var bottomBar: some View {
         HStack {
-            Text("Filter:").foregroundColor(.gray)
-            TextField(placeholder: state.filterText.isEmpty ? "type to filter, Enter to apply" : state.filterText) { text in
-                state.filterText = text
-                state.clampSelection()
+            if state.filterText.isEmpty {
+                Text("filter…").foregroundColor(.gray)
+            } else {
+                Text(state.filterText)
             }
             Spacer()
         }
-    }
-
-    private var statusBar: some View {
-        HStack {
-            Text(depsLabel).foregroundColor(.gray)
-            Spacer()
-        }
-    }
-
-    private var countLabel: String {
-        let counts = state.entryCounts
-        let visible = state.visibleEntries.count
-        let filter = state.filterText.isEmpty ? "" : " filter:\(state.filterText)"
-        if state.showDependencies {
-            return "(\(visible)/\(counts.total))\(filter)"
-        }
-        return "(\(visible)/\(counts.request) explicit)\(filter)"
-    }
-
-    private var depsLabel: String {
-        state.showDependencies ? "Showing all formulae" : "Showing explicit only"
     }
 }

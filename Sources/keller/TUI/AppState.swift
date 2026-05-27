@@ -1,11 +1,13 @@
 import Combine
 import Foundation
+import SwiftTUI
 
 class AppState: ObservableObject {
     @Published var entries: [ToolEntry] = []
     @Published var selectedIndex: Int = 0
     @Published var filterText: String = ""
     @Published var showDependencies: Bool = false
+    @Published var showHelp: Bool = false
 
     var visibleEntries: [ToolEntry] {
         entries
@@ -24,12 +26,62 @@ class AppState: ObservableObject {
         return (req, entries.count)
     }
 
+    var countLabel: String {
+        let visible = visibleEntries.count
+        let total = showDependencies ? entries.count : entryCounts.request
+        return "\(visible)/\(total)"
+    }
+
     func clampSelection() {
         let count = visibleEntries.count
         if count == 0 {
             selectedIndex = 0
         } else if selectedIndex >= count {
             selectedIndex = count - 1
+        }
+    }
+
+    func handleKey(_ key: Key) -> Bool {
+        switch key {
+        case .char(let c):
+            filterText.append(c)
+            clampSelection()
+            return true
+        case .backspace:
+            if !filterText.isEmpty {
+                filterText.removeLast()
+                clampSelection()
+            }
+            return true
+        case .ctrl("u"):
+            filterText = ""
+            clampSelection()
+            return true
+        case .arrow(.up):
+            if selectedIndex > 0 { selectedIndex -= 1 }
+            return true
+        case .arrow(.down):
+            let count = visibleEntries.count
+            if selectedIndex < count - 1 { selectedIndex += 1 }
+            return true
+        case .enter:
+            editSelected()
+            return true
+        case .ctrl("t"):
+            showDependencies.toggle()
+            clampSelection()
+            return true
+        case .ctrl("r"):
+            refresh()
+            return true
+        case .ctrl("h"):
+            showHelp.toggle()
+            return true
+        case .ctrl("q"):
+            TerminalTeardown.restore()
+            exit(0)
+        default:
+            return false
         }
     }
 

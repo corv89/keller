@@ -6,12 +6,10 @@ struct ListPanel: View {
     var body: some View {
         VStack {
             ForEach(Array(state.visibleEntries.enumerated()), id: \.element.id) { index, entry in
-                Button(entry.formula.name, hover: {
-                    state.selectedIndex = index
-                }) {
-                    state.selectedIndex = index
-                }
-                .foregroundColor(colorForEntry(entry))
+                Text(entry.formula.name)
+                    .foregroundColor(index == state.selectedIndex ? .black : colorForEntry(entry))
+                    .background(index == state.selectedIndex ? .white : .default)
+                    .frame(width: 28)
             }
         }
     }

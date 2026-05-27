@@ -12,7 +12,9 @@ struct Keller: ParsableCommand {
 
     func run() throws {
         let state = AppState.loadFromCacheOrFetch()
-        Application(rootView: KellerApp(state: state)).start()
+        let app = Application(rootView: KellerApp(state: state))
+        app.onKey = { key in state.handleKey(key) }
+        app.start()
     }
 }
 

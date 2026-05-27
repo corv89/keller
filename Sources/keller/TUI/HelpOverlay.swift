@@ -9,21 +9,21 @@ struct HelpOverlay: View {
                 Text("keller — Keybindings").bold()
                 Divider()
                 VStack(alignment: .leading) {
-                    helpRow("Arrow Up", "From list: filter field, then actions")
-                    helpRow("Arrow Down", "From actions: filter field, then list")
-                    helpRow("Arrow Left/Right", "Move between buttons / panels")
-                    helpRow("Enter", "Activate focused control")
+                    helpRow("↑/↓", "Navigate list")
+                    helpRow("type", "Filter formulae (live)")
+                    helpRow("⌫", "Delete filter character")
+                    helpRow("^U", "Clear filter")
+                    helpRow("↵", "Edit annotation in $EDITOR")
                 }
                 Divider()
                 VStack(alignment: .leading) {
-                    helpRow("Toggle Deps", "Show/hide transitive deps")
-                    helpRow("Edit", "Open $EDITOR for annotation")
-                    helpRow("Refresh", "Re-fetch brew metadata")
-                    helpRow("Clear Filter", "Remove active filter")
-                    helpRow("Quit / Ctrl-C", "Exit keller")
+                    helpRow("^T", "Toggle deps")
+                    helpRow("^R", "Refresh brew data")
+                    helpRow("^H", "Toggle this help")
+                    helpRow("^Q / ^C", "Quit")
                 }
                 Spacer()
-                Text("Navigate to Help to close").foregroundColor(.gray)
+                Text("Press ^H to close").foregroundColor(.gray)
             }
             .padding()
             .border()
@@ -32,7 +32,7 @@ struct HelpOverlay: View {
 
     private func helpRow(_ key: String, _ desc: String) -> some View {
         HStack {
-            Text(key).foregroundColor(.cyan).frame(width: 22)
+            Text(key).foregroundColor(.cyan).frame(width: 12)
             Text(desc)
         }
     }
