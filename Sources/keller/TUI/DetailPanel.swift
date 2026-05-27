@@ -4,6 +4,7 @@ struct DetailPanel: View {
     @ObservedObject var state: AppState
 
     private var width: Int { TerminalSize.detailWidth }
+    private var labelCol: Extended { 12 }
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -11,27 +12,28 @@ struct DetailPanel: View {
                 header(entry)
                 Divider()
                 description(entry)
-                if !entry.annotation.notes.isEmpty {
-                    Divider()
-                    notes(entry)
-                }
-                if !entry.annotation.tags.isEmpty {
-                    tags(entry)
-                }
-                if !entry.annotation.examples.isEmpty {
-                    examples(entry)
-                }
-                if !entry.formula.dependencies.isEmpty {
-                    Divider()
-                    dependencies(entry)
-                }
-                if let caveats = entry.formula.caveats {
-                    Divider()
-                    caveatsSection(caveats)
-                }
-                if let homepage = entry.formula.homepage {
-                    Spacer()
-                    homepageSection(homepage)
+                VStack(alignment: .leading, spacing: 1) {
+                    if !entry.annotation.notes.isEmpty {
+                        labeledBlock("Notes:", content: entry.annotation.notes)
+                    }
+                    if !entry.annotation.tags.isEmpty {
+                        tags(entry)
+                    }
+                    if !entry.annotation.examples.isEmpty {
+                        examples(entry)
+                    }
+                    if !entry.formula.dependencies.isEmpty {
+                        labeledBlock(
+                            "Deps:",
+                            content: entry.formula.dependencies.joined(separator: ", ")
+                        )
+                    }
+                    if let caveats = entry.formula.caveats {
+                        labeledBlock("Caveats:", labelColor: .yellow, content: caveats)
+                    }
+                    if let homepage = entry.formula.homepage {
+                        homepageSection(homepage)
+                    }
                 }
             } else {
                 Text("No formula selected")
@@ -62,68 +64,62 @@ struct DetailPanel: View {
     }
 
     private func description(_ entry: ToolEntry) -> some View {
-        let text = entry.formula.desc ?? "No description available"
-        return wrappedText(text)
-    }
-
-    private func notes(_ entry: ToolEntry) -> some View {
-        VStack(alignment: .leading) {
-            Text("Notes:").bold()
-            wrappedText(entry.annotation.notes)
-        }
+        wrappedText(entry.formula.desc ?? "No description available")
     }
 
     private func tags(_ entry: ToolEntry) -> some View {
         let joined = entry.annotation.tags.joined(separator: ", ")
-        return VStack(alignment: .leading) {
-            HStack {
-                Text("Tags:").bold()
-                if let first = wrapLines(joined, width: width - 6).first {
-                    Text(first).foregroundColor(.cyan)
-                }
-            }
-            ForEach(Array(wrapLines(joined, width: width - 6).dropFirst()), id: \.self) { line in
-                Text("      " + line).foregroundColor(.cyan)
-            }
-        }
+        return labeledBlock("Tags:", content: joined)
     }
 
     private func examples(_ entry: ToolEntry) -> some View {
-        VStack(alignment: .leading) {
-            Text("Examples:").bold()
-            ForEach(entry.annotation.examples, id: \.self) { ex in
-                let lines = wrapLines("  " + ex, width: width)
+        let contentWidth = width - 12
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0) {
+                Text("Examples:").foregroundColor(.gray)
+                    .frame(width: labelCol, alignment: .leading)
+                Text("")
+            }
+            ForEach(Array(entry.annotation.examples.enumerated()), id: \.offset) { _, ex in
+                let lines = wrapLines(ex, width: contentWidth)
                 ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
-                    Text(line).foregroundColor(.green)
+                    HStack(spacing: 0) {
+                        Text("").frame(width: labelCol)
+                        Text(line)
+                    }
                 }
             }
-        }
-    }
-
-    private func dependencies(_ entry: ToolEntry) -> some View {
-        let joined = entry.formula.dependencies.joined(separator: ", ")
-        return VStack(alignment: .leading) {
-            HStack {
-                Text("Deps:").bold()
-                if let first = wrapLines(joined, width: width - 6).first {
-                    Text(first).foregroundColor(.gray)
-                }
-            }
-            ForEach(Array(wrapLines(joined, width: width - 6).dropFirst()), id: \.self) { line in
-                Text("      " + line).foregroundColor(.gray)
-            }
-        }
-    }
-
-    private func caveatsSection(_ caveats: String) -> some View {
-        VStack(alignment: .leading) {
-            Text("Caveats:").bold().foregroundColor(.yellow)
-            wrappedText(caveats)
         }
     }
 
     private func homepageSection(_ url: String) -> some View {
-        Text(truncateTo(url, width: width)).foregroundColor(.blue).underline()
+        HStack(spacing: 0) {
+            Text("Homepage:").foregroundColor(.gray)
+                .frame(width: labelCol, alignment: .leading)
+            Text(truncateTo(url, width: width - 12)).foregroundColor(.blue).underline()
+        }
+    }
+
+    private func labeledBlock(
+        _ label: String,
+        labelColor: Color = .gray,
+        content: String
+    ) -> some View {
+        let contentWidth = width - 12
+        let lines = wrapLines(content, width: contentWidth)
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0) {
+                Text(label).foregroundColor(labelColor)
+                    .frame(width: labelCol, alignment: .leading)
+                Text(lines.first ?? "")
+            }
+            ForEach(Array(lines.dropFirst()), id: \.self) { line in
+                HStack(spacing: 0) {
+                    Text("").frame(width: labelCol)
+                    Text(line)
+                }
+            }
+        }
     }
 
     private func wrappedText(_ text: String) -> some View {
