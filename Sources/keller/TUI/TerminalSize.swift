@@ -27,3 +27,21 @@ enum TerminalTeardown {
         FileHandle.standardOutput.write(Data("\u{1B}[?1049l\u{1B}[?25h".utf8))
     }
 }
+
+enum TerminalSuspend {
+    static func forEditor() {
+        var tattr = termios()
+        tcgetattr(STDIN_FILENO, &tattr)
+        tattr.c_lflag |= tcflag_t(ECHO | ICANON)
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &tattr)
+        FileHandle.standardOutput.write(Data("\u{1B}[?1049l\u{1B}[?25h".utf8))
+    }
+
+    static func resume() {
+        FileHandle.standardOutput.write(Data("\u{1B}[?1049h\u{1B}[?25l".utf8))
+        var tattr = termios()
+        tcgetattr(STDIN_FILENO, &tattr)
+        tattr.c_lflag &= ~tcflag_t(ECHO | ICANON)
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &tattr)
+    }
+}

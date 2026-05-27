@@ -121,6 +121,8 @@ class AppState: ObservableObject {
 
     func editSelected() {
         guard let entry = selectedEntry else { return }
+        TerminalSuspend.forEditor()
+        defer { TerminalSuspend.resume() }
         do {
             let edited = try EditorLauncher.edit(entry.annotation, name: entry.formula.name)
 
