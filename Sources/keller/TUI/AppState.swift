@@ -3,6 +3,8 @@ import Foundation
 import SwiftTUI
 
 class AppState: ObservableObject {
+    weak var application: Application?
+
     @Published var entries: [ToolEntry] = []
     @Published var selectedIndex: Int = 0
     @Published var filterText: String = ""
@@ -120,9 +122,14 @@ class AppState: ObservableObject {
     }
 
     func editSelected() {
-        guard let entry = selectedEntry else { return }
+        guard let entry = selectedEntry, let app = application else { return }
+        app.suspendInput()
         TerminalSuspend.forEditor()
-        defer { TerminalSuspend.resume() }
+        defer {
+            TerminalSuspend.resume()
+            app.resumeInput()
+            app.forceRedraw()
+        }
         do {
             let edited = try EditorLauncher.edit(entry.annotation, name: entry.formula.name)
 

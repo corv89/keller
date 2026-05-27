@@ -205,6 +205,19 @@ open class Application {
         exit(0)
     }
 
+    public func suspendInput() {
+        stdInSource?.suspend()
+    }
+
+    public func resumeInput() {
+        stdInSource?.resume()
+    }
+
+    public func forceRedraw() {
+        renderer.setCache()
+        renderer.draw()
+    }
+
     /// Fix for: https://github.com/rensbreur/SwiftTUI/issues/25
     private func resetInputMode() {
         // Reset ECHO and ICANON values:

@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 struct EditorLauncher {
     static func edit(_ annotation: Annotation, name: String) throws -> Annotation {
@@ -12,18 +13,23 @@ struct EditorLauncher {
         let tmpFile = tmpDir.appendingPathComponent("keller-\(name)-annotation.md")
         try template.write(to: tmpFile, atomically: true, encoding: .utf8)
 
-        let process = Foundation.Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        process.arguments = [editor, tmpFile.path]
-        process.standardInput = FileHandle.standardInput
-        process.standardOutput = FileHandle.standardOutput
-        process.standardError = FileHandle.standardError
+        let editorC = strdup(editor)!
+        let fileC = strdup(tmpFile.path)!
+        defer { free(editorC); free(fileC) }
+        var args: [UnsafeMutablePointer<CChar>?] = [editorC, fileC, nil]
 
-        try process.run()
-        process.waitUntilExit()
+        var pid: pid_t = 0
+        let spawnResult = posix_spawnp(&pid, editorC, nil, nil, &args, environ)
+        guard spawnResult == 0 else {
+            throw EditorError.editorFailed(exitCode: spawnResult)
+        }
 
-        guard process.terminationStatus == 0 else {
-            throw EditorError.editorFailed(exitCode: process.terminationStatus)
+        var status: Int32 = 0
+        waitpid(pid, &status, 0)
+
+        let exitCode = (status >> 8) & 0xFF
+        guard exitCode == 0 else {
+            throw EditorError.editorFailed(exitCode: exitCode)
         }
 
         let edited = try String(contentsOf: tmpFile, encoding: .utf8)
