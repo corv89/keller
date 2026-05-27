@@ -3,6 +3,8 @@ import SwiftTUI
 struct DetailPanel: View {
     @ObservedObject var state: AppState
 
+    private var width: Int { TerminalSize.detailWidth }
+
     var body: some View {
         VStack(alignment: .leading) {
             if let entry = state.selectedEntry {
@@ -60,21 +62,29 @@ struct DetailPanel: View {
     }
 
     private func description(_ entry: ToolEntry) -> some View {
-        Text(entry.formula.desc ?? "No description available")
+        let text = entry.formula.desc ?? "No description available"
+        return wrappedText(text)
     }
 
     private func notes(_ entry: ToolEntry) -> some View {
         VStack(alignment: .leading) {
             Text("Notes:").bold()
-            Text(entry.annotation.notes)
+            wrappedText(entry.annotation.notes)
         }
     }
 
     private func tags(_ entry: ToolEntry) -> some View {
-        HStack {
-            Text("Tags:").bold()
-            Text(entry.annotation.tags.joined(separator: ", "))
-                .foregroundColor(.cyan)
+        let joined = entry.annotation.tags.joined(separator: ", ")
+        return VStack(alignment: .leading) {
+            HStack {
+                Text("Tags:").bold()
+                if let first = wrapLines(joined, width: width - 6).first {
+                    Text(first).foregroundColor(.cyan)
+                }
+            }
+            ForEach(Array(wrapLines(joined, width: width - 6).dropFirst()), id: \.self) { line in
+                Text("      " + line).foregroundColor(.cyan)
+            }
         }
     }
 
@@ -82,27 +92,46 @@ struct DetailPanel: View {
         VStack(alignment: .leading) {
             Text("Examples:").bold()
             ForEach(entry.annotation.examples, id: \.self) { ex in
-                Text("  \(ex)").foregroundColor(.green)
+                let lines = wrapLines("  " + ex, width: width)
+                ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                    Text(line).foregroundColor(.green)
+                }
             }
         }
     }
 
     private func dependencies(_ entry: ToolEntry) -> some View {
-        HStack {
-            Text("Deps:").bold()
-            Text(entry.formula.dependencies.joined(separator: ", "))
-                .foregroundColor(.gray)
+        let joined = entry.formula.dependencies.joined(separator: ", ")
+        return VStack(alignment: .leading) {
+            HStack {
+                Text("Deps:").bold()
+                if let first = wrapLines(joined, width: width - 6).first {
+                    Text(first).foregroundColor(.gray)
+                }
+            }
+            ForEach(Array(wrapLines(joined, width: width - 6).dropFirst()), id: \.self) { line in
+                Text("      " + line).foregroundColor(.gray)
+            }
         }
     }
 
     private func caveatsSection(_ caveats: String) -> some View {
         VStack(alignment: .leading) {
             Text("Caveats:").bold().foregroundColor(.yellow)
-            Text(caveats)
+            wrappedText(caveats)
         }
     }
 
     private func homepageSection(_ url: String) -> some View {
-        Text(url).foregroundColor(.blue).underline()
+        Text(truncateTo(url, width: width)).foregroundColor(.blue).underline()
+    }
+
+    private func wrappedText(_ text: String) -> some View {
+        let lines = wrapLines(text, width: width)
+        return VStack(alignment: .leading) {
+            ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                Text(line)
+            }
+        }
     }
 }
